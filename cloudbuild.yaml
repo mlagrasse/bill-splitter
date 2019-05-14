@@ -1,0 +1,26 @@
+steps:
+- name: 'gcr.io/cloud-builders/npm'
+  args: [ 'install' ]
+  dir: src
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+  - functions
+  - deploy
+  - user
+  - --source=.
+  - --trigger-http
+  - --runtime=nodejs8
+  - --region=europe-west1
+  - --memory=128MB
+  dir: src
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+  - functions
+  - deploy
+  - facture
+  - --source=.
+  - --trigger-http
+  - --runtime=nodejs8
+  - --region=europe-west1
+  - --memory=128MB
+  dir: src
