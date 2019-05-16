@@ -1,0 +1,142 @@
+openapi: 3.0.0
+info:
+  title: Tricount ENSEIRB-MATMECA API
+  description: Cette API fournit une version simplifiée de Tricount, et permet d'afficher les sommes dans la devise voulue.
+  version: "1.0"
+servers:
+  - url: https://europe-west1-projet-web-enseirb-matmeca.cloudfunctions.net
+paths:
+  /user:
+    get:
+      summary: Retourne la liste des utilisateurs, ou les informations sur un utilisateur.
+      description: Lorsque le paramètre oid est renseigné, Permet de voir le nom, le mail et le montant dû par l'utilisateur pour chacune des factures auxquelles il participe. Sinon, retourne la liste des utilisateurs.
+      parameters:
+        - name: userOid
+          in: query
+          required: false
+          description: OID de l'utilisateur voulu
+          schema:
+            type : integer
+            minimum: 1
+        - name: devise
+          in: query
+          required: true
+          description: Symbole de la devise d'affichage voulue pour le montant des factures de l'utilisateur.
+          schema:
+            type : string
+      responses:
+        '200':    # status code
+          description: Objet JSON comprenant le nom, le mail et le détail des factures.
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  user:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      email:
+                        type: string
+                      factures:
+                        type: object
+                        properties:
+                          '1':
+                            type: object
+                            properties:
+                              montant:
+                                type: integer
+                              emetteur:
+                                type: integer
+                              nbMember:
+                                type: string
+                              aPayer:
+                                type: number
+    post:
+      summary: Crée un utilisateur
+      description: Crée un utilisateur avec un nom, un mail.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+              required:
+                - name
+                - email
+      responses:
+        '201':    # status code
+          description: Renvoie OK indiquant que l'utilisateur à été créé
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+        '400':    # status code
+          description: Renvoie un message indiquant que l'utilisateur n'a pas pu être créé
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  message:
+                    type: string
+                  err:
+                    type: object
+  /facture:
+    post:
+      summary: Crée une facture.
+      description: Crée une facture avec le montant du par chaque personne.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emetteur:
+                  type: integer
+                montant:
+                  type: integer
+                users:
+                  type: array
+                  items:
+                    type: integer
+              required:
+                - name
+                - email
+      responses:
+        '200':    # status code
+          description: Renvoie OK indiquant que la facture à été créée
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+        '400':    # status code
+          description: Renvoie un message indiquant que la facture n'a pas pu être créée
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  message:
+                    type: string
+                  err:
+                    type: object
